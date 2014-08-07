@@ -22,18 +22,30 @@ typedef  itk::SignedMaurerDistanceMapImageFilter< ImageType, FloatImageType  > S
 int main(int argc, char **argv)
 {
 float eps = 0.0001;
-if( argc < 3 )
-    {
-    std::cerr << "Usage: " << std::endl;
-    std::cerr << argv[0] << " inputImageFile outputFileImage " << std::endl;
-    return EXIT_FAILURE;
-    }
 
 ReaderType::Pointer reader = ReaderType::New();
 // FloatReaderType::Pointer reader1 = FloatReaderType::New();
 const char * inputFilename  = argv[1];
 const char * outputFilename = argv[2];
+
+if( argc < 3 )
+    {
+    std::cerr << "Usage: " << std::endl;
+    std::cerr << argv[0] << " inputImageFile outputFileImage " << std::endl;
+
+//    return EXIT_FAILURE;
+    inputFilename = "/autofs/cluster/con_003/users/mert/lukeliu/zhaolong/data/rawdata/lable01.nii.gz";
+    outputFilename = "/autofs/cluster/con_003/users/mert/lukeliu/zhaolong/data/results/distancemapoutput.nii.gz";
+    std::cout<<"if not, we will use data" <<inputFilename<<" as input data"<<std::endl;
+    std::cout<<"and data " <<outputFilename<<" as output data"<<std::endl;
+
+    }
+
+
+
+
 reader->SetFileName( inputFilename  );
+
 // reader1->SetFileName( inputFilename  );
 reader->Update();
 // reader1->Update();
@@ -59,12 +71,14 @@ ImageType::Pointer image = ImageType::New();
    castFilter->Update();
    image_output = castFilter->GetOutput();
 
+   ImageType::RegionType region = image->GetLargestPossibleRegion();
+   ImageType::SizeType size = region.GetSize();
 
-for (unsigned int x = 0; x < 255; x++)
+for (unsigned int x = 0; x < size[0]; x++)
   {
-    for(unsigned int y = 0; y < 255; y++)
+    for(unsigned int y = 0; y < size[1]; y++)
     {   
-      for(unsigned int z = 0; z < 255; z++)
+      for(unsigned int z = 0; z < size[2]; z++)
       {   
         ImageType::IndexType pixelIndex;
         pixelIndex[0] = x;
@@ -81,11 +95,11 @@ for (unsigned int x = 0; x < 255; x++)
 //get the array of labels
 unsigned int array_label[100]={0};
 unsigned int i=0,j,pixelValue_label;
-for (unsigned int x = 0; x < 255; x++)
+for (unsigned int x = 0; x < size[0]; x++)
   {
-    for(unsigned int y = 0; y < 255; y++)
+    for(unsigned int y = 0; y < size[1]; y++)
     {
-      for(unsigned int z = 0; z < 255; z++)
+      for(unsigned int z = 0; z < size[2]; z++)
       {
         ImageType::IndexType pixelIndex;
         pixelIndex[0] = x;
@@ -122,11 +136,11 @@ for(m=0;array_label[m]>0;m++)
 //for(m=0;m<=5;m++)
 {
 //get the single label region
-  for (unsigned int x = 0; x < 255; x++)
+  for (unsigned int x = 0; x < size[0]; x++)
   {
-    for(unsigned int y = 0; y < 255; y++)
+    for(unsigned int y = 0; y < size[1]; y++)
     {
-      for(unsigned int z = 0; z < 255; z++)  
+      for(unsigned int z = 0; z < size[2]; z++)  
       {
       ImageType::IndexType pixelIndex;
       pixelIndex[0] = x;
@@ -176,11 +190,11 @@ image_sdt->Update();
 
 float minimum=0, maximum, pixelValue_am;
 bool flag1=true;
-for (unsigned int x = 0; x < 255; x++)
+for (unsigned int x = 0; x < size[0]; x++)
   {
-    for(unsigned int y = 0; y < 255; y++)
+    for(unsigned int y = 0; y < size[1]; y++)
     {
-      for(unsigned int z = 0; z < 255; z++)
+      for(unsigned int z = 0; z < size[2]; z++)
       {
        
         ImageType::IndexType pixelIndex;
@@ -219,11 +233,11 @@ diff=(maximum-minimum)+eps;  // may be zeros, should be think again;
 std::cout<< "the diff is: "<<diff<<std::endl;
 std::cout<< "the minmum is: "<<minimum<<std::endl;
 bool flag2; // for debug only
-for (unsigned int x = 0; x < 255; x++)
+for (unsigned int x = 0; x < size[0]; x++)
   {
-    for(unsigned int y = 0; y < 255; y++)
+    for(unsigned int y = 0; y < size[1]; y++)
     {
-      for(unsigned int z = 0; z < 255; z++)
+      for(unsigned int z = 0; z < size[2]; z++)
       {
         ImageType::IndexType pixelIndex;
         pixelIndex[0] = x;
